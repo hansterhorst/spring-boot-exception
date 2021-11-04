@@ -1,5 +1,8 @@
 package com.example.springbootstarter.student;
 
+import com.example.springbootstarter.exceptions.ApiNotFoundException;
+import com.example.springbootstarter.exceptions.ApiRequestException;
+import com.example.springbootstarter.exceptions.ApiUpdateConflictException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,7 +32,7 @@ public class StudentService {
 
       boolean studentExists = studentRepository.existsById(studentId);
       if (!studentExists) {
-         throw new IllegalStateException("Student with id " + studentId + " does not exists!");
+         throw new ApiNotFoundException("Student with id " + studentId + " does not exists!");
       }
 
       System.out.println(studentRepository.findStudentById(studentId));
@@ -44,7 +47,7 @@ public class StudentService {
       Optional<Student> studentOptionalEmail = studentRepository.findStudentByEmail(student.getEmail());
 
       if (studentOptionalEmail.isPresent()) {
-         throw new IllegalStateException("Email already taken!");
+         throw new ApiUpdateConflictException("Email already taken!");
       }
 
       studentRepository.save(student);
@@ -55,7 +58,7 @@ public class StudentService {
       boolean studentExists = studentRepository.existsById(studentId);
 
       if (!studentExists) {
-         throw new IllegalStateException("Student with id " + studentId + " does not exists!");
+         throw new ApiNotFoundException("Student with id " + studentId + " does not exists!");
       }
 
       studentRepository.deleteById(studentId);
@@ -65,11 +68,12 @@ public class StudentService {
    @Transactional
    public void updateStudent(Long studentId, String name, String email) {
 
-      System.out.println(studentId + name + email);
+      System.out.println(name);
 
       Student student = studentRepository.findById(studentId).orElseThrow(() ->
-         new IllegalStateException("Student with id " + studentId + " does not exists!"));
+         new ApiNotFoundException("Student with id " + studentId + " does not exists!"));
 
+      System.out.println(student);
 
       if (name != null && name.length() > 0 && !Objects.equals(student.getName(), name)) {
          System.out.println(name);
@@ -80,7 +84,7 @@ public class StudentService {
 
          Optional<Student> studentOptional = studentRepository.findStudentByEmail(email);
          if (studentOptional.isPresent()) {
-            throw new IllegalStateException("Email already taken!");
+            throw new ApiUpdateConflictException("Email already taken!");
          }
          System.out.println(email);
          student.setEmail(email);

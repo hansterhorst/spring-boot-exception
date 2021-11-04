@@ -1,6 +1,8 @@
 package com.example.springbootstarter.student;
 
 
+import com.example.springbootstarter.exceptions.ApiNotFoundException;
+import com.example.springbootstarter.exceptions.ApiRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,15 +23,25 @@ public class StudentController {
 
    @GetMapping
    public List<Student> getStudents() {
-      return studentService.getStudents();
+
+      try {
+         return studentService.getStudents();
+      } catch (ApiRequestException handleApiRequestException) {
+         throw new ApiRequestException("Oeps... cannot find any students!");
+      }
    }
 
 
    @GetMapping(path = "{studentId}")
    public Student getStudent(@PathVariable Long studentId) {
 
-      System.out.println(studentService.getStudent(studentId));
-      return studentService.getStudent(studentId);
+      try {
+         return studentService.getStudent(studentId);
+
+      } catch (ApiNotFoundException handleApiNotFoundException) {
+         throw new ApiRequestException("Oeps... student with id " + studentId + " not found!");
+
+      }
    }
 
 
